@@ -80,3 +80,20 @@ resource "aws_security_group" "staging_access" {
 ```bash
 bash run.sh
 ```
+
+# Terraform structure
+- Shared terraform resources will fall under template folder (ASG, EKS, RDS etc)
+- Environment specific variables will be defined in each specific environment folder (ie prod, staging)
+- During creation of resources, the terraform init command will init the S3 backend file located at the same S3 bucket but different directory, for specific environments
+- This will create parallel environments 
+- Additional use case, if AWS accounts for staging and production differs, eg production in main account, staging in child account, resources can be deployed into respective accounts via aws-sts credentials before run of terraform commands, or setting of AWS_PROFILE
+eg
+```bash
+# Set production credentials here
+aws configure --profile production
+export AWS_PROFILE=production
+
+# Set staging credentials here
+aws configure --profile staging
+export AWS_PROFILE=staging
+```
