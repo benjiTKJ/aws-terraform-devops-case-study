@@ -1,8 +1,7 @@
 # AWS Terraform DevOps Case Study
 
 > Case study on creating AWS resources using Terraform
-> <div  align="right"><img src="https://github.com/devicons/devicon/blob/master/icons/terraform/terraform-original.svg"  width="40" height="40" title="terraform" alt="terraform"/>>&nbsp;
-<img src="https://github.com/devicons/devicon/blob/master/icons/amazonwebservices/amazonwebservices-original-wordmark.svg"  width="40" height="40" title="aws" alt="aws"/>>&nbsp;</div>
+> <img src="https://github.com/devicons/devicon/blob/master/icons/terraform/terraform-original.svg"  width="100" height="100" title="terraform" alt="terraform" align="right"/>&nbsp;
 
 - Case study covers deploying multiple environments & multiple regions
 
