@@ -1,7 +1,24 @@
-# Problem statement:
-[Case Study](case-study.png)
+# AWS Terraform DevOps Case Study
 
-# Assumptions
+- Case study on creating AWS resources using Terraform, while designing the repo to allow it to create multiple environments (eg Production, Staging)
+
+## Table of contents
+
+- [Problem statement](#problem-statement)
+  - [Assumptions](#assumptions)
+- [Solutions](#solutions)
+  - [Terraform repo structure](#terraform-structure)
+  - [Increasing pod limit for nodes](#increasing-pod-limit-to-more-than-100-for-t3medium)
+  - [Domain name](#domain-name-for-production-and-staging)
+  - [multi account/shared hosted zone](#multi-account-or-shared-route53-hosted-zone)
+- [Deployment](#run-to-create-resources)
+
+## Problem statement:
+
+![Case Study](./case-study.png)
+
+### Assumptions
+
 - S3 bucket to host the TFState file backend have to be created manually before running the first terraform init command
 - EC2 keypair have to be created beforehand, or use existing keypair
 - Both ap-southeast-1 & us-east-1 will have its own seperate resources (EKS Cluster, bastion host, NLB etc)
@@ -27,7 +44,28 @@
 - Developer will connect to the RDS DB from EKS cluster via specified endpoint and port defined in RDS
 - There is no VPC peering connection between SG & US VPC, since architechture design did not specify if resource from SG & US need to talk to each other
 
-# Increasing pod limit to more than 100 for t3.medium
+## Solutions
+
+### Terraform structure
+
+- Shared terraform resources will fall under template folder (ASG, EKS, RDS etc)
+- Environment specific variables will be defined in each specific environment folder (ie prod, staging)
+- During creation of resources, the terraform init command will init the S3 backend file located at the same S3 bucket but different directory, for specific environments
+- This will create parallel environments 
+- Additional use case, if AWS accounts for staging and production differs, eg production in main account, staging in child account, resources can be deployed into respective accounts via aws-sts credentials before run of terraform commands, or setting of AWS_PROFILE
+eg
+```bash
+# Set production credentials here
+aws configure --profile production
+export AWS_PROFILE=production
+
+# Set staging credentials here
+aws configure --profile staging
+export AWS_PROFILE=staging
+```
+
+### Increasing pod limit to more than 100 for t3.medium
+
 - VPC CNI addon has been included in the cluster
 - Update these parameter via kubectl to ensure the setup is complete
 ```bash
@@ -37,9 +75,10 @@ kubectl set env daemonset aws-node -n kube-system WARM_IP_TARGET=5
 kubectl set env daemonset aws-node -n kube-system MINIMUM_IP_TARGET=2
 ```
 
-# Domain name for production and staging
-Production domain name: https://www.test123.com > this will direct to the EKS endpoint production resource
-Staging domain name: https://www.staging.test123.com > this will direct to the EKS endpoint staging resource. This endpoint can further add security group to restrict access by public and only allow internal users.
+### Domain name for production and staging
+
+- Production domain name: https://www.test123.com > this will direct to the EKS endpoint production resource
+- Staging domain name: https://www.staging.test123.com > this will direct to the EKS endpoint staging resource. This endpoint can further add security group to restrict access by public and only allow internal users.
 - Can add the below resource & reference it in the EKS ingress as well as the eks cluster security group 
     - add this annotation:
         - alb.ingress.kubernetes.io/security-groups: security group created below & eks cluster secrurity group,
@@ -73,27 +112,12 @@ resource "aws_security_group" "staging_access" {
 ```
 - Since the hosted zone is shared for both ap-southeast-1 & us-east-1, both EKS ALB in ap-southeast-1 and us-east-1 can set the host endpoint to the above production or staging url, then in the route53.tf, uncomment the line 8 onwards and update the arn of both EKS ALBs
 
-# Multi account or shared Route53 hosted zone
+### Multi account or shared Route53 hosted zone
+
 - In order to share the hosted zone, this can be done via main account in the AWS organization, creating the public hosted zone (eg route53.tf), while child accounts have the subdomain of the hosted zone
 
-# Run to create resources
+### Run to create resources
+
 ```bash
 bash run.sh
-```
-
-# Terraform structure
-- Shared terraform resources will fall under template folder (ASG, EKS, RDS etc)
-- Environment specific variables will be defined in each specific environment folder (ie prod, staging)
-- During creation of resources, the terraform init command will init the S3 backend file located at the same S3 bucket but different directory, for specific environments
-- This will create parallel environments 
-- Additional use case, if AWS accounts for staging and production differs, eg production in main account, staging in child account, resources can be deployed into respective accounts via aws-sts credentials before run of terraform commands, or setting of AWS_PROFILE
-eg
-```bash
-# Set production credentials here
-aws configure --profile production
-export AWS_PROFILE=production
-
-# Set staging credentials here
-aws configure --profile staging
-export AWS_PROFILE=staging
 ```
