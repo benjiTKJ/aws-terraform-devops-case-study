@@ -1,6 +1,10 @@
 # AWS Terraform DevOps Case Study
 
-- Case study on creating AWS resources using Terraform, while designing the repo to allow it to create multiple environments (eg Production, Staging)
+> Case study on creating AWS resources using Terraform
+> <div  align="right"><img src="https://github.com/devicons/devicon/blob/master/icons/terraform/terraform-original.svg"/>
+<img src="https://github.com/devicons/devicon/blob/master/icons/amazonwebservices/amazonwebservices-original-wordmark.svg"/></div>
+
+- Case study covers deploying multiple environments & multiple regions
 
 ## Table of contents
 
