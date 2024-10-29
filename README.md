@@ -12,6 +12,8 @@
   - [Domain name](#domain-name-for-production-and-staging)
   - [multi account/shared hosted zone](#multi-account-or-shared-route53-hosted-zone)
 - [Deployment](#run-to-create-resources)
+  - [Installing required tools](#installing-required-tools)
+  - [Create resources](#run-to-create-resources)
 
 ## Problem statement:
 
@@ -115,6 +117,28 @@ resource "aws_security_group" "staging_access" {
 ### Multi account or shared Route53 hosted zone
 
 - In order to share the hosted zone, this can be done via main account in the AWS organization, creating the public hosted zone (eg route53.tf), while child accounts have the subdomain of the hosted zone
+
+## Deployment
+
+### Installing required tools
+
+- Tools to install:
+  - [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+  - [terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
+- Pre-requisites:
+  - generate a [cli credentials](https://docs.aws.amazon.com/cli/v1/userguide/cli-authentication-user.html) in AWS IAM 
+- configure aws credentials for aws cli
+```bash
+aws configure
+
+# They will prompt you to key in your cli credentials. Input the credentials recieved from AWS IAM you have generated before
+AWS Access Key ID: your_aws_access_key_id
+AWS Secret Access Key: your_aws_secret_access_key
+Default region name: your_aws_region
+Default output format: can_leave_blank
+```
+- Once done, a folder will be created at ~/.aws with 2 files, config & credentials
+- The credentials you keyed in will be stored at ~/.aws/credentials
 
 ### Run to create resources
 
